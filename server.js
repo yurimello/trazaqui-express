@@ -25,26 +25,20 @@ const port = process.env.PORT || 3000;
 
 // ROUTES FOR API
 // =============================================================================
-
-// middleware to use for all requests
-app._router.use(function(req, res, next){
-  // do loggin
-  console.log('Request get');
-  next();
-})
-
-app._router.get('/', function(req, res){
-  res.json({message: 'Express Hello'});
-})
+const routes = require('./routes');
+let controllers = {}
 
 // CONTROLLERS FOR API
 // =============================================================================
 fs.readdirSync('./app/controllers').forEach(function (file) {
   if(file.substr(-3) == '.js') {
-    route = require('./app/controllers/' + file);
-    route.controller(app);
+    class_name = file.slice(0, -3)
+    let controller_class = require('./app/controllers/' + file);
+    controllers[class_name] = new controller_class();
   }
 });
+
+routes.setup(app, controllers);
 
 // START THE SERVER
 // =============================================================================
