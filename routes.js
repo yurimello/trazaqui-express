@@ -1,11 +1,4 @@
 function setup(app, controllers) {
-  // middleware to use for all requests
-  app._router.use(function(req, res, next){
-    // do loggin
-    console.log('Request get');
-    next();
-  })
-
   //Root path
   app.get('/', function(req, res){
     res.json({message: 'Express Hello'});

@@ -10,10 +10,15 @@ const app = express();
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const mongoose = require('mongoose');
-const dbConnection = mongoose.connect('mongodb://trazaqui:master01@ds159237.mlab.com:59237/trazaqui-express').connection;
-// const connection = mongoose.connect('mongodb://localhost/test').connection;
+const morgan = require('morgan')
 
-dbConnection.on('error', console.log)
+const config = require('./config')
+const routes = require('./routes');
+
+const port = process.env.PORT || 3000;
+const enviroment = process.env.ENV || 'development'
+
+let controllers = {}
 
 // configure app to use bodyParser()
 // this will let us get the data from a POST
@@ -21,12 +26,14 @@ dbConnection.on('error', console.log)
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
-const port = process.env.PORT || 3000;
+// Use morgan for logging
+app.use(morgan('combined'));
+
 
 // ROUTES FOR API
 // =============================================================================
-const routes = require('./routes');
-let controllers = {}
+
+
 
 // CONTROLLERS FOR API
 // =============================================================================
@@ -43,4 +50,4 @@ routes.setup(app, controllers);
 // START THE SERVER
 // =============================================================================
 app.listen(port);
-console.log('Magic happens on port ' + port);
+console.log("Express server listening on port %d in %s mode", port, enviroment);
