@@ -21,40 +21,32 @@ const PlacesController = function(){
   };
 
   this.create = function(req, res){
-    let place = new Place();
-    place.name = req.body.name;
+    let place = new Place(req.body);
 
     place.save(function (err) {
       if (err)
-        console.log(err);
+        return res.send(err);
 
-      res.json({message: 'Place created!'});
+      res.json({message: 'Place created!', place});
     });
   };
 
   this.update = function(req, res){
     Place.findById(req.params.place_id, function(err, place){
-      if (err)
-        res.send(err);
-
-      place.name = req.body.name;
-
-      place.save(function (err) {
-        if (err) {
-          console.log(err);
-        } else {
-          res.json({message: 'Place updated!'});
-        }
-      })
+      if(err) res.send(err);
+      Object.assign(place, req.body).save((err, place) => {
+        if(err) res.send(err);
+        res.json({ message: 'Place updated!', place });
+      });
     });
   };
 
   this.destroy = function(req, res){
-    Place.remove({ _id: req.params.place_id }, function(err, place) {
+    Place.remove({ _id: req.params.place_id }, function(err, result) {
       if (err)
           res.send(err);
 
-      res.json({ message: 'Successfully deleted' });
+      res.json({ message: 'Place deleted!', result });
     });
   };
 }

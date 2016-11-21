@@ -9,7 +9,7 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const fs = require('fs');
-const mongoose = require('mongoose');
+let mongoose = require('mongoose');
 const morgan = require('morgan')
 
 const config = require('./config')
@@ -17,6 +17,8 @@ const routes = require('./routes');
 
 const port = process.env.PORT || 3000;
 const enviroment = process.env.ENV || 'development'
+
+const dbConnection = mongoose.connect(config.db[enviroment]).connection;
 
 let controllers = {}
 
@@ -26,8 +28,9 @@ let controllers = {}
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
-// Use morgan for logging
-app.use(morgan('combined'));
+// Use morgan for logging only in development
+if(enviroment === 'development')
+  app.use(morgan('combined'));
 
 
 // ROUTES FOR API
@@ -51,3 +54,5 @@ routes.setup(app, controllers);
 // =============================================================================
 app.listen(port);
 console.log("Express server listening on port %d in %s mode", port, enviroment);
+
+module.exports = app;
