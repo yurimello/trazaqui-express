@@ -13,9 +13,10 @@ const ItinerariesController = function(){
 
   this.show = function(req, res){
     Itinerary.findById(req.params.itinerary_id, function(err, itinerary){
-      if(err)
-        res.send(err)
-
+      if(err){
+        res.status(404);
+        res.send({message: 'Itinerary not found'})
+      }
       res.json(itinerary);
     });
   };
@@ -25,8 +26,7 @@ const ItinerariesController = function(){
 
     itinerary.save(function (err) {
       if (err){
-        res.status(403)
-        // res.sendStatus(403);
+        res.status(403);
         res.send(err);
       }
       else {

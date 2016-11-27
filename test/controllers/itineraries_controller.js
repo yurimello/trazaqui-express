@@ -10,7 +10,7 @@ let should = chai.should();
 
 chai.use(chaiHttp);
 
-describe('Itinerary', () => {
+describe('ItinerariesController', () => {
   beforeEach((done) => { //Before each test we empty the database
 
       Itinerary.remove({}, (err) => {
@@ -219,23 +219,100 @@ describe('Itinerary', () => {
     });
   });
 
-  // describe('/GET/:itinerary_id /api/itineraries/:itinerary_id', () => {
-  //   it('it should GET a itinerary by the given id', (done) => {
-  //     let itinerary = new Itinerary({name: 'Prezunic'})
-  //
-  //     itinerary.save((err, itinerary) => {
-  //       chai.request(server)
-  //         .get('/api/itineraries/' + itinerary.id)
-  //         .send(itinerary)
-  //         .end((err, res) => {
-  //           res.should.have.status(200);
-  //           res.body.should.be.a('object');
-  //           res.body.should.have.property('name');
-  //           res.body.should.have.property('_id').eql(itinerary.id);
-  //           done();
-  //         })
-  //     })
-  //   });
+  describe('/GET/:itinerary_id /api/itineraries/:itinerary_id', () => {
+
+    function actionPath(itinerary){
+      return '/api/itineraries/' + itinerary.id
+    }
+
+    describe('with correct id', () => {
+      function itinerary(){
+        let i = new Itinerary({
+          places: [{
+            name: 'Prezunic',
+            items: [{
+              name: '1kg de açucar',
+            }]
+          }]
+        })
+        return i
+      }
+
+      it('status must to be 200(ok)', (done) =>{
+        itinerary().save((err, itinerary) => {
+          getServer(actionPath(itinerary), itinerary)
+          .end((err, res) => {
+            res.should.have.status(200);
+            done();
+          })
+        })
+      });
+
+      it('response must to be an object', (done) =>{
+        itinerary().save((err, itinerary) => {
+          getServer(actionPath(itinerary), itinerary)
+          .end((err, res) => {
+            res.body.should.be.a('object');
+            done();
+          })
+        })
+      });
+
+      it('response must have first place named equals to given itinerary', (done) =>{
+        itinerary().save((err, itinerary) => {
+          getServer(actionPath(itinerary), itinerary)
+          .end((err, res) => {
+            res.body.places[0].should.have.property('name').eql(itinerary.places[0].name);
+            done();
+          })
+        })
+      });
+
+      it('response id must be equals to given itinerary', (done) =>{
+        itinerary().save((err, itinerary) => {
+          getServer(actionPath(itinerary), itinerary)
+          .end((err, res) => {
+            res.body.should.have.property('_id').eql(itinerary.id);
+            done();
+          })
+        })
+      });
+    })
+
+    describe('with incorrect id', () =>{
+      it('status must to be 404(not found)', (done) =>{
+        getServer(actionPath('not_found'), {})
+        .end((err, res) => {
+          res.should.have.status(404);
+          done();
+        })
+      });
+
+      it('response must not found message', (done) =>{
+        getServer(actionPath('not_found'), {})
+        .end((err, res) => {
+          res.body.should.have.property('message').eql('Itinerary not found')
+          done();
+        })
+      });
+    })
+  });
+
+    // it('it should GET a itinerary by the given id', (done) => {
+    //
+    //   itinerary.save((err, itinerary) => {
+    //     chai.request(server)
+    //       .get()
+    //       .send(itinerary)
+    //       .end((err, res) => {
+    //         res.should.have.status(200);
+    //         res.body.should.be.a('object');
+    //         res.body.should.have.property('name');
+    //         res.body.should.have.property('_id').eql(itinerary.id);
+    //         done();
+    //       })
+    //   })
+    // });
   // })
   //
   // describe('/PUT/:itinerary_id /api/itineraries/:itinerary_id', () => {
